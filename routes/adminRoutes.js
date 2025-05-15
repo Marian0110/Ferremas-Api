@@ -3,10 +3,8 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 
-router.delete('/crear', adminController.crearAdmin);
 router.post('/login', adminController.login);
-router.put('/cambiar-contrasena/:usuario', adminController.cambiarContrasena);
-router.get('/obtener/:usuario', adminController.obtenerAdmin);
-router.delete('/eliminar/:usuario', adminController.eliminarAdmin);
+router.post('/cambiar-contrasena', adminController.cambiarContrasena);
+router.get('/primer-login/:id_admin', adminController.checkPrimerLogin);
 
 module.exports = router;

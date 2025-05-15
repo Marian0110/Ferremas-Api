@@ -1,73 +1,71 @@
 //Capa de logica de negocio
+const AdminRepository = require('../repositories/adminRepository');
 const Admin = require('../models/admin');
-const adminRepository = require('../repositories/adminRepository');
 
 class AdminService {
-  async crearAdmin(datos) {
-
-    const nuevoAdmin = new Admin(
-        datos.usuario,
-        datos.contrasena,
-    );
-
-    return await adminRepository.crearAdmin(nuevoAdmin);
- }
-
   async login(usuario, contrasena) {
-      try {
-        console.log("Datos recibidos en servicio:", { usuario, contrasena }); // 👈 ¡Agrega esto!
-        const admin = await adminRepository.login(usuario, contrasena);
-        return admin;
-      } catch (err) {
-        console.error("Error en servicio (loginAdmin):", err);
-        throw err;
+    try {
+      //Buscar el admin en la BD
+      const admin = await AdminRepository.obtener(usuario);
+      
+      if (!admin) {
+        throw new Error('Usuario no encontrado');
       }
-  }
 
-  async cambiarContrasena(usuario, contrasenaActual, nuevaContrasena) {
-    // Verificar credenciales actuales
-    const credencialesValidas = await adminRepository.login(usuario, contrasenaActual);
-    if (!credencialesValidas) {
-      throw new Error('Contraseña actual incorrecta');
-    }
-
-    const actualizado = await adminRepository.cambiarContrasena(usuario, nuevaContrasena);
-    if (!actualizado) {
-      throw new Error('No se pudo cambiar la contraseña');
-    }
-
-    return {
-      success: true,
-      message: 'Contraseña cambiada con éxito'
-    };
-  }
-
-  async obtenerAdmin(usuario) {
-    const admin = await adminRepository.getByUsuario(usuario);
-    if (!admin) {
-      throw new Error('Administrador no encontrado');
-    }
-
-    return {
-      success: true,
-      data: {
-        id: admin.ID_ADMIN,
-        usuario: admin.USUARIO,
-        fechaRegistro: admin.FECHA_REGISTRO
+      if (admin.contrasena !== contrasena) {
+        throw new Error('Contraseña incorrecta');
       }
-    };
+
+      return {
+        success: true,
+        message: 'Login exitoso',
+        admin: {
+          id_admin: admin.id_admin,
+          usuario: admin.usuario
+        }
+      };
+    } catch (error) {
+      console.error('Error en AdminService.login:', error);
+      throw error;
+    }
   }
 
-  async eliminarAdmin(usuario) {
-    const eliminado = await adminRepository.eliminarAdmin(usuario);
-    if (!eliminado) {
-      throw new Error('No se pudo eliminar el administrador');
-    }
+  async cambiarContrasena(id_admin, contrasenaActual, nuevaContrasena) {
+    try {
+      //Verificar que el admin existe
+      const admin = await AdminRepository.obtenerPorId(id_admin);
+      if (!admin) {
+        throw new Error('Administrador no encontrado');
+      }
 
-    return {
-      success: true,
-      message: 'Administrador eliminado con éxito'
-    };
+      //Verificar contraseña actual (solo si no es primer login)
+      if (!admin.primer_login && admin.contrasena !== contrasenaActual) {
+        throw new Error('Contraseña actual incorrecta');
+      }
+
+      //Actualizar contraseña
+      const actualizado = await AdminRepository.cambiarContrasena(
+        id_admin, 
+        nuevaContrasena
+      );
+
+      if (!actualizado) {
+        throw new Error('No se pudo actualizar la contraseña');
+      }
+
+      return {
+        success: true,
+        message: 'Contraseña actualizada exitosamente'
+      };
+    } catch (error) {
+      console.error('Error en AdminService.cambiarContrasena:', error);
+      throw error;
+    }
+  }
+
+  async esPrimerLogin(id_admin) {
+    const admin = await AdminRepository.obtenerPorId(id_admin);
+    return admin ? admin.primer_login : false;
   }
 }
 
