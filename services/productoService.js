@@ -19,7 +19,8 @@ class ProductoService {
     nombre: productoData.nombre,
     precio: Number(productoData.precio) || 0,
     stock: Number(productoData.stock) || 0, 
-    categoria: productoData.categoria.toString()
+    categoria: productoData.categoria.toString(),
+    imagen: productoData.imagen || null
   });
 
   try {
@@ -45,7 +46,8 @@ class ProductoService {
     "Código de marca": productoDB.COD_MARCA,
     "Nombre": productoDB.NOMBRE,
     "Categoría": productoDB.CATEGORIA,
-    "Stock": productoDB.STOCK
+    "Stock": productoDB.STOCK,
+    "Imagen": productoDB.IMAGEN || null
   };
 
   if (productoDB.PRECIO) {
@@ -74,7 +76,8 @@ class ProductoService {
     nombre: productoData.nombre || productoExistente.Nombre,
     stock: productoData.stock !== undefined ? Number(productoData.stock) : productoExistente.Stock,
     categoria: productoData.categoria || productoExistente.Categoría,
-    precio: productoData.precio !== undefined ? Number(productoData.precio) : null
+    precio: productoData.precio !== undefined ? Number(productoData.precio) : null,
+    imagen: productoData.imagen || productoExistente.Imagen
   };
 
   if (productoData.precio !== undefined && isNaN(productoData.precio)) {
@@ -113,6 +116,7 @@ class ProductoService {
       "Nombre": producto.nombre,
       "Categoría": producto.categoria,
       "Stock": producto.stock,
+      "imagen": producto.imagen,
       "Precio": [
         {
           "Fecha": producto.fecha_precio,

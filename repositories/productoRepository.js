@@ -27,7 +27,8 @@ class ProductoRepository {
            p_nombre => :nombre,
            p_precio => :precio,
            p_stock => :stock,
-           p_categoria => :categoria
+           p_categoria => :categoria,
+           p_imagen => :imagen
          );
          COMMIT; -- Añadir COMMIT explícito
        END;`,
@@ -38,7 +39,8 @@ class ProductoRepository {
         nombre: producto.nombre,
         precio: producto.precio || 0, // Valor por defecto si es undefined/null
         stock: producto.stock || 0,   // Valor por defecto si es undefined/null
-        categoria: producto.categoria
+        categoria: producto.categoria,
+        imagen: producto.imagen || null
       },
       { 
         autoCommit: true // Asegurar auto-commit
@@ -131,6 +133,17 @@ class ProductoRepository {
       idCategoria = catResult.rows[0].ID_CATEGORIA;
     }
 
+    // Manejo de la imagen si se proporciona
+    if (imagenFile) {
+      // 1. Guardar el archivo en el sistema de archivos
+      const uploadPath = path.join(__dirname, '../uploads', imagenFile.name);
+      await fs.promises.writeFile(uploadPath, imagenFile.buffer);
+      
+      // 2. Actualizar la ruta de la imagen en la base de datos
+      updateFields.push('IMAGEN = :imagen');
+      bindVars.imagen = imagenFile.name;
+    }
+
     // Construir la consulta UPDATE dinámicamente
     let updateFields = [];
     let bindVars = { cod_producto: codProducto };
@@ -215,7 +228,7 @@ class ProductoRepository {
       { autoCommit: true }
     );
     
-    // Luego elimina el producto
+    // Luego eliminar el producto
     const result = await connection.execute(
       `DELETE FROM PRODUCTOS 
        WHERE COD_PRODUCTO = :codProducto`,
@@ -223,7 +236,7 @@ class ProductoRepository {
       { autoCommit: true }
     );
 
-    // Retorna true si se elimino
+    // Retorna true si se eliminó al menos una fila
     return result.rowsAffected > 0;
     
   } catch (error) {
@@ -251,7 +264,8 @@ class ProductoRepository {
             p.MARCA, 
             p.COD_MARCA, 
             p.NOMBRE, 
-            p.STOCK, 
+            p.STOCK,
+            p.IMAGEN,  
             c.NOMBRE as CATEGORIA,
             pp.VALOR as PRECIO,
             pp.FECHA as FECHA_PRECIO
@@ -276,6 +290,7 @@ class ProductoRepository {
         cod_marca: row.COD_MARCA,
         nombre: row.NOMBRE,
         stock: row.STOCK,
+        imagen: row.IMAGEN,
         categoria: row.CATEGORIA,
         precio: row.PRECIO,
         fecha_precio: row.FECHA_PRECIO

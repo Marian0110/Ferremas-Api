@@ -8,7 +8,8 @@ class Producto {
     precio,
     stock,
     categoria,
-    fecha_registro
+    fecha_registro,
+    imagen
   }) {
     this.cod_producto = cod_producto;
     this.marca = marca;
@@ -18,6 +19,7 @@ class Producto {
     this.stock = stock;
     this.categoria = categoria;
     this.fecha_registro = fecha_registro;
+    this.imagen = imagen; 
   }
 }
 

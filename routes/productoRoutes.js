@@ -2,9 +2,10 @@
 const express = require('express');
 const router = express.Router();
 const productoController = require('../controllers/productoController');
+const upload = require('../middlewares/uploads');
 
 // CRUD de Productos
-router.post('/agregar', productoController.crearProducto);
+router.post('/agregar', upload.single('imagen'), productoController.crearProducto);
 router.get('/listar', productoController.listarProductos);
 router.get('/obtener/:codigo', productoController.obtenerProducto);
 router.patch('/actualizar/:codigo', productoController.actualizarProducto);

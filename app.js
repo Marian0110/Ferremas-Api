@@ -3,7 +3,9 @@ const app = express();
 const clienteRoutes = require('./routes/clienteRoutes');
 const productoRoutes = require('./routes/productoRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const cors = require('cors');
 
+app.use(cors());
 app.use(express.json());
 app.use('/api/clientes', clienteRoutes);
 app.use('/api/productos', productoRoutes);
