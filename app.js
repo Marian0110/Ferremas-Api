@@ -7,6 +7,7 @@ const categoriaRoutes = require('./routes/categoriaRoutes');
 const comunaRoutes = require('./routes/comunaRoutes');
 const empleadoRoutes = require('./routes/empleadoRoutes');
 const rolRoutes = require('./routes/rolRoutes');
+const webpayRoutes = require('./routes/webpayRoutes');
 
 const cors = require('cors');
 
@@ -19,6 +20,7 @@ app.use('/ferremas/categoria', categoriaRoutes);
 app.use('/ferremas/sucursales', comunaRoutes);
 app.use('/ferremas/empleados', empleadoRoutes);
 app.use('/ferremas/roles', rolRoutes);
+app.use('/ferremas/webpay', webpayRoutes);
 
 const PORT = 3000;
 app.listen(PORT, () => {

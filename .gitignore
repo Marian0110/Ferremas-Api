@@ -1,4 +1,4 @@
-server copy.js
+webpay.js
 testConn.js
 db.js
 node_modules/
