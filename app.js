@@ -12,13 +12,13 @@ const cors = require('cors');
 
 app.use(cors());
 app.use(express.json());
-app.use('/api/clientes', clienteRoutes);
-app.use('/api/productos', productoRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/categoria', categoriaRoutes);
-app.use('/api/sucursales', comunaRoutes);
-app.use('/api/empleados', empleadoRoutes);
-app.use('/api/roles', rolRoutes);
+app.use('/ferremas/clientes', clienteRoutes);
+app.use('/ferremas/productos', productoRoutes);
+app.use('/ferremas/admin', adminRoutes);
+app.use('/ferremas/categoria', categoriaRoutes);
+app.use('/ferremas/sucursales', comunaRoutes);
+app.use('/ferremas/empleados', empleadoRoutes);
+app.use('/ferremas/roles', rolRoutes);
 
 const PORT = 3000;
 app.listen(PORT, () => {
