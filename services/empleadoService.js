@@ -40,7 +40,11 @@ class EmpleadoService {
   }
 
   async eliminar(id) {
-    return await EmpleadoRepository.eliminar(id);
+    const eliminado = await EmpleadoRepository.eliminar(id);
+    if (!eliminado) {
+      throw new Error('Empleado no encontrado');
+    }
+    return true;
   }
 }
 

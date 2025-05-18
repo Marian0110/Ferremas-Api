@@ -168,14 +168,25 @@ class EmpleadoRepository {
     let connection;
     try {
       connection = await db.getConnection();
-      await connection.execute(
+      const result = await connection.execute(
         `DELETE FROM EMPLEADOS WHERE ID_EMPLEADO = :id`,
         [id],
         { autoCommit: true }
       );
-      return true;
+      
+      // Verificar si se eliminó alguna fila
+      return result.rowsAffected > 0;
+    } catch (error) {
+      console.error('Error al eliminar empleado:', error);
+      throw new Error(`Error al eliminar empleado: ${error.message}`);
     } finally {
-      if (connection) await connection.close();
+      if (connection) {
+        try {
+          await connection.close();
+        } catch (error) {
+          console.error('Error al cerrar conexión:', error);
+        }
+      }
     }
   }
 }

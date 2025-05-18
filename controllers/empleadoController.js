@@ -45,6 +45,9 @@ async function eliminar(req, res) {
     await EmpleadoService.eliminar(req.params.id);
     res.json({ message: 'Empleado eliminado exitosamente' });
   } catch (error) {
+    if (error.message === 'Empleado no encontrado') {
+      return res.status(404).json({ error: error.message });
+    }
     res.status(500).json({ error: error.message });
   }
 }
