@@ -9,16 +9,33 @@ class EmpleadoRepository {
     try {
       connection = await db.getConnection();
       const result = await connection.execute(
-        `SELECT e.*, r.NOMBRE_ROL, s.NOMBRE_COMUNA 
-         FROM EMPLEADOS e
-         JOIN ROL_EMPLEADO r ON e.ID_ROL = r.ID_ROL
-         JOIN COMUNAS s ON e.ID_COMUNA = s.ID_COMUNA`,
+        `SELECT 
+          e.ID_EMPLEADO, 
+          e.NOMBRES, 
+          e.APELLIDOS, 
+          e.CORREO, 
+          e.TELEFONO, 
+          e.CONTRASENA, 
+          r.NOMBRE_ROL, 
+          s.NOMBRE_COMUNA 
+        FROM EMPLEADOS e
+        JOIN ROL_EMPLEADO r ON e.ID_ROL = r.ID_ROL
+        JOIN COMUNAS s ON e.ID_COMUNA = s.ID_COMUNA`,
         [],
         { outFormat: oracledb.OUT_FORMAT_OBJECT }
       );
       return result.rows;
+    } catch (error) {
+      console.error('Error en empleadoRepository.getAll:', error);
+      throw new Error(`Error al obtener empleados: ${error.message}`);
     } finally {
-      if (connection) await connection.close();
+      if (connection) {
+        try {
+          await connection.close();
+        } catch (error) {
+          console.error('Error al cerrar la conexión:', error);
+        }
+      }
     }
   }
 
@@ -27,13 +44,35 @@ class EmpleadoRepository {
     try {
       connection = await db.getConnection();
       const result = await connection.execute(
-        `SELECT * FROM EMPLEADOS WHERE ID_EMPLEADO = :id`,
-        [id],
+        `SELECT 
+          e.ID_EMPLEADO, 
+          e.NOMBRES, 
+          e.APELLIDOS, 
+          e.CORREO, 
+          e.TELEFONO, 
+          e.CONTRASENA, 
+          r.NOMBRE_ROL, 
+          s.NOMBRE_COMUNA 
+        FROM EMPLEADOS e
+        JOIN ROL_EMPLEADO r ON e.ID_ROL = r.ID_ROL
+        JOIN COMUNAS s ON e.ID_COMUNA = s.ID_COMUNA
+        WHERE e.ID_EMPLEADO = :id`,
+        { id },
         { outFormat: oracledb.OUT_FORMAT_OBJECT }
       );
+      
       return result.rows[0] || null;
+    } catch (error) {
+      console.error('Error en empleadoRepository.getById:', error);
+      throw new Error(`Error al obtener empleado por ID: ${error.message}`);
     } finally {
-      if (connection) await connection.close();
+      if (connection) {
+        try {
+          await connection.close();
+        } catch (error) {
+          console.error('Error al cerrar la conexión:', error);
+        }
+      }
     }
   }
 
@@ -64,31 +103,62 @@ class EmpleadoRepository {
     }
   }
 
-  async actualizart(id, empleado) {
+  async actualizar(id, empleadoData) {
     let connection;
     try {
       connection = await db.getConnection();
-      await connection.execute(
-        `UPDATE EMPLEADOS SET 
-         NOMBRES = :nombres, 
-         APELLIDOS = :apellidos,
-         CORREO = :correo,
-         TELEFONO = :telefono,
-         ID_ROL = :id_rol,
-         ID_COMUNA = :id_comuna
-         WHERE ID_EMPLEADO = :id`,
-        {
-          nombres: empleado.nombres,
-          apellidos: empleado.apellidos,
-          correo: empleado.correo,
-          telefono: empleado.telefono,
-          id_rol: empleado.id_rol,
-          id_comuna: empleado.id_comuna,
-          id: id
-        },
-        { autoCommit: true }
-      );
+      
+      // Construir consulta dinámicamente
+      let updateFields = [];
+      let bindParams = { id: id };
+      
+      // Solo incluir los campos que no son undefined
+      if (empleadoData.nombres !== undefined) {
+        updateFields.push('NOMBRES = :nombres');
+        bindParams.nombres = empleadoData.nombres;
+      }
+      
+      if (empleadoData.apellidos !== undefined) {
+        updateFields.push('APELLIDOS = :apellidos');
+        bindParams.apellidos = empleadoData.apellidos;
+      }
+      
+      if (empleadoData.correo !== undefined) {
+        updateFields.push('CORREO = :correo');
+        bindParams.correo = empleadoData.correo;
+      }
+      
+      if (empleadoData.telefono !== undefined) {
+        updateFields.push('TELEFONO = :telefono');
+        bindParams.telefono = empleadoData.telefono;
+      }
+      
+      if (empleadoData.id_rol !== undefined) {
+        updateFields.push('ID_ROL = :id_rol');
+        bindParams.id_rol = empleadoData.id_rol;
+      }
+      
+      if (empleadoData.id_comuna !== undefined) {
+        updateFields.push('ID_COMUNA = :id_comuna');
+        bindParams.id_comuna = empleadoData.id_comuna;
+      }
+      
+      // Si no hay campos para actualizar, retornar
+      if (updateFields.length === 0) {
+        return true;
+      }
+      
+      // Construir y ejecutar la consulta
+      const query = `UPDATE EMPLEADOS SET ${updateFields.join(', ')} WHERE ID_EMPLEADO = :id`;
+      
+      console.log('Query de actualización:', query);
+      console.log('Parámetros:', bindParams);
+      
+      await connection.execute(query, bindParams, { autoCommit: true });
       return true;
+    } catch (error) {
+      console.error('Error en actualizar empleado:', error);
+      throw new Error(`Error al actualizar empleado: ${error.message}`);
     } finally {
       if (connection) await connection.close();
     }
