@@ -1,15 +1,15 @@
+// Logica HTTP: Recibe el request (el req.body del frontend) y llama al servicio
 const productoService = require('../services/productoService');
 
 async function crearProducto(req, res) {
   try {
     const imagen = req.file ? req.file.filename : null;
     
-    // Conversión explícita a número
     const id_categoria = req.body.id_categoria ? parseInt(req.body.id_categoria, 10) : undefined;
     
     const productoData = {
       ...req.body,
-      id_categoria, // Reemplazar con el valor numérico
+      id_categoria,
       imagen
     };
     

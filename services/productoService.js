@@ -124,15 +124,13 @@ class ProductoService {
       "Marca": producto.marca,
       "Código": producto.cod_marca,
       "Nombre": producto.nombre,
-      "Categoría": producto.categoria,
-      "Stock": producto.stock,
-      "imagen": producto.imagen,
       "Precio": [
         {
           "Fecha": producto.fecha_precio,
           "Valor": producto.precio
         }
-      ]
+      ],
+      "Categoría": producto.categoria
     }));
   }
 }

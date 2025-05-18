@@ -277,14 +277,11 @@ class ProductoRepository {
         marca: row.MARCA,
         cod_marca: row.COD_MARCA,
         nombre: row.NOMBRE,
-        stock: row.STOCK,
-        imagen: row.IMAGEN,
-        categoria: {
-          id_categoria: row.ID_CATEGORIA,
-          nombre: row.CATEGORIA
-        },
         precio: row.PRECIO,
-        fecha_precio: row.FECHA_PRECIO
+        fecha_precio: row.FECHA_PRECIO,
+        categoria: {
+          Nombre: row.CATEGORIA
+        }
       }));
     } catch (error) {
       throw new Error(`Error al listar productos: ${error.message}`);
