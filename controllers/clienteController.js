@@ -32,5 +32,22 @@ async function login(req, res) {
   }
 }
 
+async function obtenerPedidosCliente(req, res) {
+    try {
+        const idCliente = req.params.id;
+        
+        if (!idCliente) {
+            return res.status(400).json({ error: 'ID de cliente no proporcionado' });
+        }
+        
+        // Obtener pedidos del cliente
+        const pedidos = await ventaService.obtenerVentasPorCliente(idCliente);
+        
+        res.json(pedidos);
+    } catch (error) {
+        console.error('Error al obtener pedidos del cliente:', error);
+        res.status(500).json({ error: error.message });
+    }
+}
 
-module.exports = { registrar, login };
+module.exports = { registrar, login, obtenerPedidosCliente };
