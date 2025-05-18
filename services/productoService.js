@@ -149,8 +149,6 @@ class ProductoService {
           "Valor": producto.precio
         }
       ],
-      "Categoría": producto.categoria,
-      "stock": producto.stock
     }));
   }
 }
