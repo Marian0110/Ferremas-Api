@@ -80,4 +80,13 @@ async function listarProductos(req, res){
   }
 };
 
-module.exports = { crearProducto, obtenerProducto, actualizarProducto, eliminarProducto, listarProductos };
+async function consultarProductos(req, res){
+  try {
+    const productos = await productoService.consultarProductos();
+    res.json(productos);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { crearProducto, obtenerProducto, actualizarProducto, eliminarProducto, listarProductos, consultarProductos };

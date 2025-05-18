@@ -131,6 +131,25 @@ class ProductoService {
         }
       ],
       "Categoría": producto.categoria,
+      "stock": producto.stock,
+      "Imagen": producto.imagen || null
+    }));
+  }
+
+  async consultarProductos() {
+    const productosDB = await productoRepository.getAll();
+    return productosDB.map(producto => ({
+      "Código del producto": producto.cod_producto,
+      "Marca": producto.marca,
+      "Código": producto.cod_marca,
+      "Nombre": producto.nombre,
+      "Precio": [
+        {
+          "Fecha": producto.fecha_precio,
+          "Valor": producto.precio
+        }
+      ],
+      "Categoría": producto.categoria,
       "stock": producto.stock
     }));
   }

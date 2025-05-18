@@ -313,7 +313,8 @@ class ProductoRepository {
         categoria: {
           Nombre: row.CATEGORIA
         },
-        stock: row.STOCK
+        stock: row.STOCK,
+        imagen: row.IMAGEN
       }));
     } catch (error) {
       throw new Error(`Error al listar productos: ${error.message}`);
