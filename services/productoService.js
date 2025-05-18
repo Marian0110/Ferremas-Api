@@ -130,7 +130,8 @@ class ProductoService {
           "Valor": producto.precio
         }
       ],
-      "Categoría": producto.categoria
+      "Categoría": producto.categoria,
+      "stock": producto.stock
     }));
   }
 }

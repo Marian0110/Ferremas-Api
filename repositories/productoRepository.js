@@ -210,22 +210,53 @@ class ProductoRepository {
     try {
       connection = await db.getConnection();
       
+      // 1. Producto existe?
+      const checkProduct = await connection.execute(
+        `SELECT COUNT(*) AS count FROM PRODUCTOS WHERE COD_PRODUCTO = :codProducto`,
+        { codProducto },
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      
+      if (checkProduct.rows[0].COUNT === 0) {
+        throw new Error(`El producto con código ${codProducto} no existe`);
+      }
+      
+      // 2. Verificar registros en DETALLE_VENTA
+      const detalleCheck = await connection.execute(
+        `SELECT COUNT(*) AS count FROM DETALLE_VENTA WHERE COD_PRODUCTO = :codProducto`,
+        { codProducto },
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      
+      if (detalleCheck.rows[0].COUNT > 0) {
+        throw new Error('No se puede eliminar el producto porque está asociado a ventas existentes');
+      }
+      
+      // 3. Eliminar los precios asociados al producto
       await connection.execute(
-        `DELETE FROM PRECIO_PRODUCTO 
-         WHERE COD_PRODUCTO = :codProducto`,
-        [codProducto],
+        `DELETE FROM PRECIO_PRODUCTO WHERE COD_PRODUCTO = :codProducto`,
+        { codProducto },
+        { autoCommit: false }
+      );
+      
+      // 4. Finalmente eliminar el producto
+      const result = await connection.execute(
+        `DELETE FROM PRODUCTOS WHERE COD_PRODUCTO = :codProducto`,
+        { codProducto },
         { autoCommit: true }
       );
       
-      const result = await connection.execute(
-        `DELETE FROM PRODUCTOS 
-         WHERE COD_PRODUCTO = :codProducto`,
-        [codProducto],
-        { autoCommit: true }
-      );
-
       return result.rowsAffected > 0;
     } catch (error) {
+      // En caso de error, intentamos hacer rollback
+      if (connection) {
+        try {
+          await connection.execute(`ROLLBACK`, [], { autoCommit: true });
+        } catch (rollbackError) {
+          console.error('Error al hacer rollback:', rollbackError);
+        }
+      }
+      
       console.error('Error en repository.delete:', error);
       throw new Error(`Error al eliminar producto: ${error.message}`);
     } finally {
@@ -281,7 +312,8 @@ class ProductoRepository {
         fecha_precio: row.FECHA_PRECIO,
         categoria: {
           Nombre: row.CATEGORIA
-        }
+        },
+        stock: row.STOCK
       }));
     } catch (error) {
       throw new Error(`Error al listar productos: ${error.message}`);
