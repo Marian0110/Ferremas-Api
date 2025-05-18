@@ -3,16 +3,25 @@ const productoService = require('../services/productoService');
 async function crearProducto(req, res) {
   try {
     const imagen = req.file ? req.file.filename : null;
+    
+    // Conversión explícita a número
+    const id_categoria = req.body.id_categoria ? parseInt(req.body.id_categoria, 10) : undefined;
+    
     const productoData = {
       ...req.body,
+      id_categoria, // Reemplazar con el valor numérico
       imagen
     };
+    
+    console.log('Datos enviados al servicio:', productoData);
+    
     const producto = await productoService.crearProducto(productoData);
     res.status(201).json(producto);
   } catch (error) {
+    console.error('Error en controlador:', error);
     res.status(500).json({ error: error.message });
   }
-};
+}
 
 async function obtenerProducto(req, res) {
   try {

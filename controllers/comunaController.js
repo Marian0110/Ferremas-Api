@@ -1,5 +1,5 @@
 // Logica HTTP: Recibe el request (el req.body del frontend) y llama al servicio
-const ComunaService = require('../services/comunaService');
+const ComunaService = require('../services/comunaService.js');
 
 async function obtenerComunas(req, res) {
   try {

@@ -7,7 +7,7 @@ class Producto {
     nombre,
     precio,
     stock,
-    categoria,
+    id_categoria,
     fecha_registro,
     imagen
   }) {
@@ -17,7 +17,7 @@ class Producto {
     this.nombre = nombre;
     this.precio = precio;
     this.stock = stock;
-    this.categoria = categoria;
+    this.id_categoria = id_categoria;
     this.fecha_registro = fecha_registro;
     this.imagen = imagen; 
   }

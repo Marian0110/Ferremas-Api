@@ -4,37 +4,47 @@ const productoRepository = require('../repositories/productoRepository');
 const categoriaRepository = require('../repositories/categoriaRepository'); 
 
 class ProductoService {
-   async crearProducto(productoData) {
-  // Validación exhaustiva
-  if (!productoData.cod_producto || !productoData.categoria) {
-    throw new Error('Código de producto y categoría son requeridos');
+  async crearProducto(productoData) {
+    // Validación
+    if (!productoData.cod_producto) {
+      throw new Error('Código de producto es requerido');
+    }
+    
+    if (productoData.id_categoria === undefined || productoData.id_categoria === null) {
+      throw new Error('ID de categoría es requerido');
+    }
+    
+    // Convertir y validar id_categoria
+    const idCategoria = Number(productoData.id_categoria);
+    if (isNaN(idCategoria)) {
+      throw new Error('El ID de categoría debe ser un número válido');
+    }
+    
+    console.log('ID Categoría validado:', idCategoria);
+
+    const producto = new Producto({
+      cod_producto: productoData.cod_producto,
+      marca: productoData.marca,
+      cod_marca: productoData.cod_marca,
+      nombre: productoData.nombre,
+      precio: Number(productoData.precio) || 0,
+      stock: Number(productoData.stock) || 0, 
+      id_categoria: idCategoria, // Usar el valor numérico validado
+      imagen: productoData.imagen || null
+    });
+
+    try {
+      const codProducto = await productoRepository.create(producto);
+      return { 
+        success: true,
+        message: 'Producto creado con éxito',
+        cod_producto: codProducto 
+      };
+    } catch (error) {
+      console.error('Error en servicio.crearProducto:', error);
+      throw error;
+    }
   }
-
-  console.log('Datos recibidos en servicio:', productoData);
-
-  const producto = new Producto({
-    cod_producto: productoData.cod_producto,
-    marca: productoData.marca,
-    cod_marca: productoData.cod_marca,
-    nombre: productoData.nombre,
-    precio: Number(productoData.precio) || 0,
-    stock: Number(productoData.stock) || 0, 
-    categoria: productoData.categoria.toString(),
-    imagen: productoData.imagen || null
-  });
-
-  try {
-    const codProducto = await productoRepository.create(producto);
-    return { 
-      success: true,
-      message: 'Producto creado con éxito',
-      cod_producto: codProducto 
-    };
-  } catch (error) {
-    console.error('Error en servicio.crearProducto:', error);
-    throw error;
-  }
-}
 
   async obtenerProducto(codProducto) {
   const productoDB = await productoRepository.getById(codProducto);
