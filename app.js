@@ -9,6 +9,7 @@ const empleadoRoutes = require('./routes/empleadoRoutes');
 const rolRoutes = require('./routes/rolRoutes');
 const webpayRoutes = require('./routes/webpayRoutes');
 const ventaRoutes = require('./routes/ventaRoutes'); // Importar nueva ruta
+const carritoRoutes = require('./routes/carritoRoutes');
 
 const cors = require('cors');
 const path = require('path');
@@ -24,6 +25,7 @@ app.use('/ferremas/empleados', empleadoRoutes);
 app.use('/ferremas/roles', rolRoutes);
 app.use('/ferremas/webpay', webpayRoutes);
 app.use('/ferremas/ventas', ventaRoutes); // Añadir esta línea para la nueva ruta
+app.use('/ferremas/carrito', carritoRoutes);
 
 app.use('/ferremas/uploads', express.static(path.join(__dirname, 'uploads')));
 
