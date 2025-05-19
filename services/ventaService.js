@@ -228,6 +228,29 @@ class VentaService {
         throw new Error(`Error al obtener detalles de venta: ${error.message}`);
     }
     }
+
+    async listarVentas() {
+    try {
+        const ventas = await ventaRepository.listarTodasLasVentas();
+        
+        return ventas.map(venta => ({
+        id: venta.ID_VENTA,
+        fecha: venta.FECHA_VENTA,
+        total: venta.TOTAL,
+        estado: venta.ESTADO,
+        orden_compra: venta.ORDEN_COMPRA,
+        cliente: {
+            id: venta.ID_CLIENTE,
+            nombres: venta.NOMBRES,
+            apellidos: venta.APELLIDOS,
+            correo: venta.CORREO
+        }
+        }));
+    } catch (error) {
+        console.error('Error en listarVentas:', error);
+        throw new Error(`Error al listar ventas: ${error.message}`);
+    }
+    }
 }
 
 module.exports = new VentaService();

@@ -17,6 +17,16 @@ class VentaController {
             res.status(500).json({ error: error.message });
         }
     }
+
+    async listarVentas(req, res) {
+    try {
+        const ventas = await ventaService.listarVentas();
+        res.json(ventas);
+    } catch (error) {
+        console.error('Error en controlador.listarVentas:', error);
+        res.status(500).json({ error: error.message });
+    }
+    }
 }
 
 module.exports = new VentaController();

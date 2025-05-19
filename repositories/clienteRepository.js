@@ -1,5 +1,6 @@
 //Servicio hace ejecutar el query en ORACLE
 const db = require('../db');
+const oracledb = require('oracledb');
 
 // Función para crear un cliente en la base de datos
 // Esta función recibe un objeto cliente y lo inserta en la tabla CLIENTES
@@ -57,5 +58,34 @@ async function loginCliente(correo, contrasena) {
   }
 }
 
-
-module.exports = { crearCliente, loginCliente };
+async function getAll() {
+    let connection;
+    try {
+      connection = await db.getConnection();
+      const result = await connection.execute(
+        `SELECT 
+          NOMBRES,
+          APELLIDOS,
+          CORREO,
+          TELEFONO,
+          DIRECCION
+          FROM CLIENTES
+          `,
+        [],
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      return result.rows;
+    } catch (error) {
+      console.error('Error en clienteRepository.getAll:', error);
+      throw new Error(`Error al obtener clientes: ${error.message}`);
+    } finally {
+      if (connection) {
+        try {
+          await connection.close();
+        } catch (error) {
+          console.error('Error al cerrar la conexión:', error);
+        }
+      }
+    }
+  }
+module.exports = { crearCliente, loginCliente, getAll };

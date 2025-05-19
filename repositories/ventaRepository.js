@@ -213,6 +213,43 @@ class VentaRepository {
       }
     }
   }
+
+  async listarTodasLasVentas() {
+    let connection;
+    try {
+        connection = await db.getConnection();
+        const result = await connection.execute(
+        `SELECT 
+            v.ID_VENTA, 
+            v.ID_CLIENTE, 
+            v.FECHA_VENTA, 
+            v.TOTAL, 
+            v.ESTADO, 
+            v.ORDEN_COMPRA,
+            c.NOMBRES, 
+            c.APELLIDOS, 
+            c.CORREO
+        FROM VENTAS v
+        JOIN CLIENTES c ON v.ID_CLIENTE = c.ID_CLIENTE
+        ORDER BY v.FECHA_VENTA DESC`,
+        [],
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        
+        return result.rows;
+    } catch (error) {
+        console.error('Error al listar todas las ventas:', error);
+        throw new Error(`Error al listar ventas: ${error.message}`);
+    } finally {
+        if (connection) {
+        try {
+            await connection.close();
+        } catch (error) {
+            console.error('Error al cerrar conexión:', error);
+        }
+        }
+    }
+    }
 }
 
 module.exports = new VentaRepository();

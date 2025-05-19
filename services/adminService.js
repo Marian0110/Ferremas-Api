@@ -67,6 +67,32 @@ class AdminService {
     const admin = await AdminRepository.obtenerPorId(id_admin);
     return admin ? admin.primer_login : false;
   }
+
+  async crearAdmin(usuario, contrasena) {
+    try {
+      // Verificar si ya existe un admin con ese usuario
+      const adminExistente = await AdminRepository.obtener(usuario);
+      
+      if (adminExistente) {
+        throw new Error('El usuario ya existe');
+      }
+      
+      // Crear el nuevo admin
+      const nuevoAdmin = await AdminRepository.crear(usuario, contrasena);
+      
+      return {
+        success: true,
+        message: 'Administrador creado exitosamente',
+        admin: {
+          id_admin: nuevoAdmin.id_admin,
+          usuario: nuevoAdmin.usuario
+        }
+      };
+    } catch (error) {
+      console.error('Error en AdminService.crearAdmin:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = new AdminService();

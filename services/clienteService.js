@@ -31,5 +31,8 @@ async function loginCliente(correo, contrasena) {
   }
 }
 
+async function listar() {
+      return await clienteRepository.getAll();
+    }
 
-module.exports = { registrarCliente, loginCliente};
+module.exports = { registrarCliente, loginCliente, listar};

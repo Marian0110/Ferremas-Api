@@ -7,28 +7,58 @@ class AdminRepository {
     let connection;
     try {
       connection = await db.getConnection();
-      const result = await connection.execute(
-        `SELECT ID_ADMIN, USUARIO, CONTRASENA, FECHA_REGISTRO 
-         FROM ADMINISTRADOR 
-         WHERE USUARIO = :usuario`,
-        [usuario],
+      
+      // Consulta para confirmar que la tabla tiene datos
+      console.log("Buscando usuario:", usuario);
+      const countQuery = await connection.execute(
+        `SELECT COUNT(*) AS TOTAL FROM ADMINISTRADOR`,
+        [],
         { outFormat: oracledb.OUT_FORMAT_OBJECT }
       );
-
+      console.log("Total registros en ADMINISTRADOR:", countQuery.rows[0].TOTAL);
+      
+      // Lista todos los usuarios para verificar
+      const allUsers = await connection.execute(
+        `SELECT USUARIO FROM ADMINISTRADOR`,
+        [],
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      console.log("Usuarios disponibles:", allUsers.rows.map(r => r.USUARIO));
+      
+      // Usar UPPER para ignorar mayúsculas/minúsculas
+      const result = await connection.execute(
+        `SELECT ID_ADMIN, USUARIO, CONTRASENA, PRIMER_LOGIN, FECHA_REGISTRO 
+        FROM ADMINISTRADOR 
+        WHERE UPPER(USUARIO) = UPPER(:usuario)`,
+        { usuario },
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      
+      console.log("Filas encontradas:", result.rows.length);
+      
       if (result.rows.length === 0) {
         return null;
       }
-
+      
       const adminData = result.rows[0];
+      console.log("Datos encontrados:", JSON.stringify({
+        id: adminData.ID_ADMIN,
+        usuario: adminData.USUARIO,
+        // No mostrar contraseña completa por seguridad
+        contrasena_length: adminData.CONTRASENA ? adminData.CONTRASENA.length : 0,
+        primer_login: adminData.PRIMER_LOGIN
+      }));
+      
       return new Admin(
         adminData.ID_ADMIN,
         adminData.USUARIO,
         adminData.CONTRASENA,
-        adminData.FECHA_REGISTRO
+        adminData.FECHA_REGISTRO,
+        adminData.PRIMER_LOGIN === 1
       );
     } catch (error) {
-      console.error('Error en AdminRepository:', error);
-      throw new Error('Error al buscar administrador');
+      console.error('Error detallado en AdminRepository.obtener:', error);
+      throw error;
     } finally {
       if (connection) {
         try {
@@ -38,7 +68,7 @@ class AdminRepository {
         }
       }
     }
-    }
+  }
 
     async cambiarContrasena(id_admin, nuevaContrasena) {
     let connection;
@@ -88,6 +118,45 @@ class AdminRepository {
         if (connection) await connection.close();
     }
     }
+
+  async crear(usuario, contrasena) {
+    let connection;
+    try {
+      connection = await db.getConnection();
+      
+      const result = await connection.execute(
+        `INSERT INTO ADMINISTRADOR (USUARIO, CONTRASENA) 
+        VALUES (:usuario, :contrasena)
+        RETURNING ID_ADMIN INTO :id_admin`,
+        {
+          usuario: usuario,
+          contrasena: contrasena,
+          id_admin: { type: oracledb.NUMBER, dir: oracledb.BIND_OUT }
+        },
+        { autoCommit: true }
+      );
+      
+      console.log("Administrador creado con ID:", result.outBinds.id_admin[0]);
+      
+      return {
+        id_admin: result.outBinds.id_admin[0],
+        usuario: usuario,
+        contrasena: contrasena,
+        primer_login: 1
+      };
+    } catch (error) {
+      console.error('Error al crear administrador:', error);
+      throw error;
+    } finally {
+      if (connection) {
+        try {
+          await connection.close();
+        } catch (error) {
+          console.error('Error al cerrar conexión:', error);
+        }
+      }
+    }
+  }
 }
 
 module.exports = new AdminRepository();

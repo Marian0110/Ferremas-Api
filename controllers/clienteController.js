@@ -50,4 +50,14 @@ async function obtenerPedidosCliente(req, res) {
     }
 }
 
-module.exports = { registrar, login, obtenerPedidosCliente };
+
+async function listarClientes(req, res) {
+    try {
+      const clientes = await clienteService.listar();
+      res.json(clientes);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+module.exports = { registrar, login, obtenerPedidosCliente, listarClientes};

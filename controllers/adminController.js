@@ -64,4 +64,25 @@ async function checkPrimerLogin(req, res) {
     });
   }
 }
-module.exports = { login, cambiarContrasena, checkPrimerLogin };
+
+async function crearAdmin(req, res) {
+  try {
+    const { usuario, contrasena } = req.body;
+
+    if (!usuario || !contrasena) {
+      return res.status(400).json({
+        success: false,
+        message: 'Usuario y contraseña son requeridos'
+      });
+    }
+
+    const result = await AdminService.crearAdmin(usuario, contrasena);
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+}
+module.exports = { login, cambiarContrasena, checkPrimerLogin, crearAdmin };
