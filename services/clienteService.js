@@ -33,6 +33,30 @@ async function loginCliente(correo, contrasena) {
 
 async function listar() {
       return await clienteRepository.getAll();
+}
+
+async function actualizarCliente(idCliente, datosActualizados) {
+  try {
+    // Validar campos permitidos para actualización
+    const camposPermitidos = ['nombres', 'apellidos', 'telefono', 'correo', 'direccion'];
+    const datosFiltrados = {};
+    
+    for (const campo in datosActualizados) {
+      if (camposPermitidos.includes(campo.toLowerCase())) {
+        datosFiltrados[campo] = datosActualizados[campo];
+      }
     }
 
-module.exports = { registrarCliente, loginCliente, listar};
+    // Validar que haya datos válidos para actualizar
+    if (Object.keys(datosFiltrados).length === 0) {
+      throw new Error('No se proporcionaron datos válidos para actualizar');
+    }
+
+    // Llamar al repositorio
+    return await clienteRepository.actualizarCliente(idCliente, datosFiltrados);
+  } catch (err) {
+    console.error('Error en servicio (actualizarCliente):', err);
+    throw err;
+  }
+}
+module.exports = { registrarCliente, loginCliente, listar, actualizarCliente};

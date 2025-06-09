@@ -64,6 +64,7 @@ async function getAll() {
       connection = await db.getConnection();
       const result = await connection.execute(
         `SELECT 
+          ID_CLIENTE,
           NOMBRES,
           APELLIDOS,
           CORREO,
@@ -87,5 +88,41 @@ async function getAll() {
         }
       }
     }
+}
+
+async function actualizarCliente(idCliente, datosActualizados) {
+  let conn;
+  try {
+    conn = await db.getConnection();
+    
+    // consulta dinámica
+    let setClause = [];
+    const bindVars = { id: idCliente };
+    
+    for (const [key, value] of Object.entries(datosActualizados)) {
+      setClause.push(`${key.toUpperCase()} = :${key}`);
+      bindVars[key] = value;
+    }
+    
+    if (setClause.length === 0) {
+      throw new Error('No hay campos válidos para actualizar');
+    }
+    
+    const query = `UPDATE CLIENTES SET ${setClause.join(', ')} WHERE ID_CLIENTE = :id`;
+    
+    const result = await conn.execute(
+      query,
+      bindVars,
+      { autoCommit: true }
+    );
+    
+    return result.rowsAffected > 0;
+    
+  } catch (err) {
+    console.error('Error en repositorio (actualizarCliente):', err);
+    throw err;
+  } finally {
+    if (conn) await conn.close();
   }
-module.exports = { crearCliente, loginCliente, getAll };
+}
+module.exports = { crearCliente, loginCliente, getAll, actualizarCliente };

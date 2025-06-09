@@ -52,12 +52,34 @@ async function obtenerPedidosCliente(req, res) {
 
 
 async function listarClientes(req, res) {
-    try {
+      try {
       const clientes = await clienteService.listar();
       res.json(clientes);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+}
 
-module.exports = { registrar, login, obtenerPedidosCliente, listarClientes};
+  async function actualizarCliente(req, res) {
+  try {
+    const idCliente = req.params.id;
+    const datosActualizados = req.body;
+    
+    if (!idCliente || !datosActualizados) {
+      return res.status(400).json({ mensaje: 'Datos incompletos' });
+    }
+
+    // Llamar al servicio para actualizar
+    const resultado = await clienteService.actualizarCliente(idCliente, datosActualizados);
+    
+    if (resultado) {
+      res.status(200).json({ mensaje: 'Datos actualizados exitosamente' });
+    } else {
+      res.status(404).json({ mensaje: 'Cliente no encontrado' });
+    }
+  } catch (err) {
+    console.error('Error al actualizar cliente:', err);
+    res.status(500).json({ mensaje: 'Error al actualizar datos del cliente' });
+  }
+}
+module.exports = { registrar, login, obtenerPedidosCliente, listarClientes, actualizarCliente};

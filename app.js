@@ -24,7 +24,7 @@ app.use('/ferremas/sucursales', comunaRoutes);
 app.use('/ferremas/empleados', empleadoRoutes);
 app.use('/ferremas/roles', rolRoutes);
 app.use('/ferremas/webpay', webpayRoutes);
-app.use('/ferremas/ventas', ventaRoutes); // Añadir esta línea para la nueva ruta
+app.use('/ferremas/ventas', ventaRoutes); 
 app.use('/ferremas/carrito', carritoRoutes);
 
 app.use('/ferremas/uploads', express.static(path.join(__dirname, 'uploads')));
