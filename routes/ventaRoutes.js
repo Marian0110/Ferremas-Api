@@ -6,8 +6,4 @@ const ventaController = require('../controllers/ventaController');
 router.get('/detalles/:id', ventaController.obtenerDetallesVenta);
 router.get('/listar', ventaController.listarVentas);
 
-// Puedes añadir más rutas de ventas si las necesitas en el futuro
-// router.get('/', ventaController.listarVentas);
-// router.post('/', ventaController.crearVenta);
-
 module.exports = router;

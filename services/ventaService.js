@@ -251,6 +251,32 @@ class VentaService {
         throw new Error(`Error al listar ventas: ${error.message}`);
     }
     }
+
+    async obtenerVentasPorCliente(idCliente) {
+        try {
+            // Validar ID del cliente
+            if (!idCliente || isNaN(idCliente)) {
+            throw new Error('ID de cliente inválido');
+            }
+
+            // Obtener las ventas del repositorio
+            const ventas = await ventaRepository.listarVentasPorCliente(Number(idCliente));
+
+            // Formatear la respuesta
+            return ventas.map(venta => ({
+            id: venta.ID_VENTA,
+            fecha: venta.FECHA_VENTA,
+            total: venta.TOTAL,
+            estado: venta.ESTADO,
+            orden_compra: venta.ORDEN_COMPRA
+            }));
+
+        } catch (error) {
+            console.error('Error en obtenerVentasPorCliente:', error);
+            throw new Error(`Error al obtener ventas del cliente: ${error.message}`);
+        }
+        }
+
 }
 
 module.exports = new VentaService();

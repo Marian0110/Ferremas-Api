@@ -1,5 +1,6 @@
 // Logica HTTP: Recibe el request (el req.body del frontend) y llama al servicio
 const clienteService = require('../services/clienteService'); 
+const ventaService = require('../services/ventaService'); 
 
 // Controlador para registrar un cliente
 async function registrar(req, res) {
