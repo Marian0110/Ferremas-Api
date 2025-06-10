@@ -125,4 +125,34 @@ async function actualizarCliente(idCliente, datosActualizados) {
     if (conn) await conn.close();
   }
 }
-module.exports = { crearCliente, loginCliente, getAll, actualizarCliente };
+
+async function crearContacto(datosContacto) {
+    let conn;
+    try {
+        conn = await db.getConnection();
+        const result = await conn.execute(
+            `INSERT INTO CONTACTO_CLIENTES 
+            (ID_CLIENTE, ASUNTO, MENSAJE)
+            VALUES (:id_cliente, :asunto, :mensaje)`,
+            {
+                id_cliente: datosContacto.id_cliente, // Puede ser null
+                asunto: datosContacto.asunto,
+                mensaje: datosContacto.mensaje
+            },
+            { autoCommit: true }
+        );
+        return result;
+    } catch (err) {
+        console.error('Error en repositorio (crearContacto):', err);
+        throw err;
+    } finally {
+        if (conn) {
+            try {
+                await conn.close();
+            } catch (err) {
+                console.error('Error al cerrar la conexión en crearContacto:', err);
+            }
+        }
+    }
+}
+module.exports = { crearCliente, loginCliente, getAll, actualizarCliente, crearContacto };

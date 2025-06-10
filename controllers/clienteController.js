@@ -83,4 +83,31 @@ async function listarClientes(req, res) {
     res.status(500).json({ mensaje: 'Error al actualizar datos del cliente' });
   }
 }
-module.exports = { registrar, login, obtenerPedidosCliente, listarClientes, actualizarCliente};
+
+async function enviarContacto(req, res) {
+    try {
+        const { id_cliente, asunto, mensaje } = req.body; 
+
+        if (!asunto || !mensaje) {
+            return res.status(400).json({ mensaje: 'Asunto y mensaje son campos obligatorios.' });
+        }
+
+        if (id_cliente !== undefined && id_cliente !== null && isNaN(parseInt(id_cliente))) {
+            return res.status(400).json({ mensaje: 'ID de cliente inválido.' });
+        }
+
+        const datosContacto = {
+            id_cliente: id_cliente ? parseInt(id_cliente) : null, // Convertir a número si existe, si no, null
+            asunto,
+            mensaje
+        };
+
+        await clienteService.registrarContacto(datosContacto);
+
+        res.status(200).json({ mensaje: 'Mensaje de contacto enviado exitosamente.' });
+    } catch (err) {
+        console.error('Error al enviar mensaje de contacto:', err);
+        res.status(500).json({ mensaje: 'Error al enviar mensaje de contacto.' });
+    }
+}
+module.exports = { registrar, login, obtenerPedidosCliente, listarClientes, actualizarCliente, enviarContacto};

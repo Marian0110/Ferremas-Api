@@ -7,5 +7,6 @@ router.post('/registro', clienteController.registrar);
 router.post('/login', clienteController.login);
 router.get('/listar', clienteController.listarClientes);
 router.get('/:id/pedidos', clienteController.obtenerPedidosCliente);
-router.patch('/:id/actualizar', clienteController.actualizarCliente); 
+router.patch('/:id/actualizar', clienteController.actualizarCliente);
+router.post('/contacto', clienteController.enviarContacto);
 module.exports = router;

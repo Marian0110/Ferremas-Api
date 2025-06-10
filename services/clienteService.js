@@ -37,7 +37,6 @@ async function listar() {
 
 async function actualizarCliente(idCliente, datosActualizados) {
   try {
-    // Validar campos permitidos para actualización
     const camposPermitidos = ['nombres', 'apellidos', 'telefono', 'correo', 'direccion'];
     const datosFiltrados = {};
     
@@ -52,11 +51,20 @@ async function actualizarCliente(idCliente, datosActualizados) {
       throw new Error('No se proporcionaron datos válidos para actualizar');
     }
 
-    // Llamar al repositorio
     return await clienteRepository.actualizarCliente(idCliente, datosFiltrados);
   } catch (err) {
     console.error('Error en servicio (actualizarCliente):', err);
     throw err;
   }
 }
-module.exports = { registrarCliente, loginCliente, listar, actualizarCliente};
+
+async function registrarContacto(datosContacto) {
+    try {
+        return await clienteRepository.crearContacto(datosContacto);
+    } catch (err) {
+        console.error("Error en servicio (registrarContacto):", err);
+        throw err;
+    }
+}
+
+module.exports = { registrarCliente, loginCliente, listar, actualizarCliente, registrarContacto};
